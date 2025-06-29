@@ -16,6 +16,8 @@ from streamlit.components.v1 import html
 from streamlit_option_menu import option_menu
 import base64
 from PIL import Image
+# --- ⚠️ Configuration Streamlit (à mettre tout en haut) ---
+st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
 
 # --- Import modules personnalisés ---
 from etp import (
@@ -139,7 +141,7 @@ def charger_donnees():
 
 # --- Application principale ---
 def main():
-    st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
+    #st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
     afficher_entete()
 
     with st.spinner("⏳ Un petit instant, le calcul est en cours... 😊"):
