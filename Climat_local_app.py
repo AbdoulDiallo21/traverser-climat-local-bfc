@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import io
 import os
+import gdown
 import requests
 import time
 import calendar
@@ -98,14 +99,12 @@ def afficher_footer():
 # --- Chargement du fichier fusionné depuis Google Drive ---
 @st.cache_data
 def charger_donnees():
-    # Lien direct de téléchargement
-    file_id = "130L3lvx7uvbWt09WpXXr7OJsBuPJpkLr"
-    url = f"https://drive.google.com/uc?id={file_id}"
-    response = requests.get(url)
-    response.raise_for_status()  # pour détecter erreurs réseau
-    parquet_data = io.BytesIO(response.content)
-    return pd.read_parquet(parquet_data)
-    
+    # URL Google Drive correcte pour gdown
+    url = "https://drive.google.com/uc?id=130L3lvx7uvbWt09WpXXr7OJsBuPJpkLr"
+    output = "/tmp/data.parquet"
+    gdown.download(url, output, quiet=False)
+    return pd.read_parquet(output)
+
 @st.cache_data()
 def filtrer_commune(df, commune):
     return df[df["Nom_commun"] == commune].copy()
