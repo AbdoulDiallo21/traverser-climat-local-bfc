@@ -6,7 +6,6 @@ import calendar
 from statsmodels.nonparametric.smoothers_lowess import lowess
 import plotly.graph_objects as go
 import streamlit as st
-import warnings
 
 @st.cache_data
 def pretraiter_etp_annuelle(df_commune):
