@@ -29,7 +29,7 @@ from etp import (
 )
 from petp import (
     pretraiter_bilan_annuelle,
-     pretraiter_bilan_mensuel,
+    pretraiter_bilan_mensuel,
     afficher_bilan_annuelle,
     afficher_bilan_mensuel,
     afficher_titre_petp,
@@ -180,7 +180,7 @@ def main():
                 "Évapotranspiration potentielle": "ETP_Q",
                 "Bilan Hydrique climatique": "P_ETP",
                 "Précipitations": "PRECIP",
-                "Indice d'humidité des sols": "SWI",
+                "Indice d'humidité du sol": "SWI",
                 "Température (°C)": "TEMP",
             }
             selected_label = st.selectbox("Indicateur", list(indicateurs_disponibles.keys()))
