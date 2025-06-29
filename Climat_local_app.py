@@ -24,44 +24,11 @@ from PIL import Image
 st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
 
 # --- Import modules personnalisés ---
-from etp import (
-    pretraiter_etp_annuelle,
-    pretraiter_etp_mensuel,
-    afficher_etp_annuelle,
-    afficher_etp_mensuel,
-    calculer_etp_mensuel_commune,
-    afficher_titre_etp,
-    afficher_simulateur_etp
-)
-from petp import (
-    pretraiter_bilan_annuelle,
-    pretraiter_bilan_mensuel,
-    afficher_bilan_annuelle,
-    afficher_bilan_mensuel,
-    afficher_titre_petp,
-)
-
-from precip import (
-    pretraiter_precip_annuelle,
-    pretraiter_precip_mensuel,
-    afficher_precip_annuelle,
-    afficher_precip_mensuel,
-    afficher_titre_precip
-)
-from swi import (
-    pretraiter_swi_annuel,
-    pretraiter_swi_mensuel,
-    afficher_swi_annuel,
-    afficher_swi_mensuel,
-    afficher_titre_swi
-)
-from temperature import (
-    pretraiter_temp_annuelle,
-    pretraiter_temp_mensuel,
-    afficher_temp_annuelle,
-    afficher_temp_mensuel,
-    afficher_titre_temp
-)
+from etp import *
+from petp import *
+from precip import *
+from swi import *
+from temperature import *
 
 # --- Habillage titre ---
 HTML_BANNER = """
@@ -128,55 +95,25 @@ def afficher_footer():
     with col6:
         st.image("logo-cnrs.png", width=120)
 
-# --- Chargement et nettoyage des données ---
+# --- Chargement du fichier fusionné depuis Google Drive ---
 @st.cache_data()
 def charger_donnees():
-    try:
-        # URLs des fichiers sources
-        url_sim2 = "https://drive.google.com/uc?export=download&id=1S_4UV2_IeI3Wr08-JObRxx9_RGzriNql"
-        url_ratio = "https://drive.google.com/uc?export=download&id=1uUkd8D_JAKR_dfpDzpSyBcg22IBh2Yrt"
+    file_id = "1I6aV6USh7SCVe5kqHyuyDOB2ot3Zu1I5"
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    fichier_local = "data/Donnees_Climat_Merge.parquet"
 
-        # Fichiers locaux
-        fichier_sim2 = "SIM2.parquet"
-        fichier_ratio = "Ratio_Comm.parquet"
+    if not os.path.exists(fichier_local):
+        response = requests.get(url)
+        response.raise_for_status()
+        with open(fichier_local, "wb") as f:
+            f.write(response.content)
 
-        # Téléchargement conditionnel
-        if not os.path.exists(fichier_sim2):
-            response = requests.get(url_sim2)
-            response.raise_for_status()  # En cas d’erreur réseau
-            with open(fichier_sim2, "wb") as f:
-                f.write(response.content)
+    return pd.read_parquet(fichier_local)
 
-        if not os.path.exists(fichier_ratio):
-            response = requests.get(url_ratio)
-            response.raise_for_status()
-            with open(fichier_ratio, "wb") as f:
-                f.write(response.content)
+@st.cache_data()
+def filtrer_commune(df, commune):
+    return df[df["Nom_commun"] == commune].copy()
 
-        # Lecture
-        df_sim2 = pd.read_parquet(fichier_sim2, engine="pyarrow")
-        df_ratio = pd.read_parquet(fichier_ratio, engine="pyarrow")
-
-        # Nettoyage
-        df_sim2 = df_sim2.copy()
-        df_sim2['time'] = pd.to_datetime(df_sim2['time'], errors='coerce')
-        for col in ['Year', 'Month', 'ETP_Q', 'P_ETP']:
-            if col in df_sim2.columns:
-                df_sim2[col] = pd.to_numeric(df_sim2[col], errors='coerce')
-
-        # Fusion
-        df = pd.merge(
-            df_sim2,
-            df_ratio[['idPoint', 'Nom_commun', 'Ratio_Comm']],
-            on='idPoint',
-            how='right'  # ou 'left' selon ton besoin réel
-        )
-
-        return df
-
-    except Exception as e:
-        st.error(f"❌ Erreur lors du chargement des données : {e}")
-        st.stop()
 # --- Application principale ---
 def main():
     #st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
