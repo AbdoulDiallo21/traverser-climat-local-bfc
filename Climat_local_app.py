@@ -4,6 +4,8 @@
 # --- Importation des packages ---
 import numpy as np
 import pandas as pd
+import io
+import requests
 import time
 import calendar
 import matplotlib as plt
@@ -15,7 +17,7 @@ import streamlit as st
 from streamlit.components.v1 import html
 from streamlit_option_menu import option_menu
 import base64
-import requests
+
 from PIL import Image
 # --- ⚠️ Configuration Streamlit (à mettre tout en haut) ---
 st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
