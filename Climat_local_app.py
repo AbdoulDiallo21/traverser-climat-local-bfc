@@ -18,7 +18,7 @@ import base64
 from PIL import Image
 
 # --- Import modules personnalisés ---
-from modules.etp import (
+from etp import (
     pretraiter_etp_annuelle,
     pretraiter_etp_mensuel,
     afficher_etp_annuelle,
@@ -27,7 +27,7 @@ from modules.etp import (
     afficher_titre_etp,
     afficher_simulateur_etp
 )
-from modules.petp import (
+from petp import (
     pretraiter_bilan_annuelle,
      pretraiter_bilan_mensuel,
     afficher_bilan_annuelle,
@@ -35,21 +35,21 @@ from modules.petp import (
     afficher_titre_petp,
 )
 
-from modules.precip import (
+from precip import (
     pretraiter_precip_annuelle,
     pretraiter_precip_mensuel,
     afficher_precip_annuelle,
     afficher_precip_mensuel,
     afficher_titre_precip
 )
-from modules.swi import (
+from swi import (
     pretraiter_swi_annuel,
     pretraiter_swi_mensuel,
     afficher_swi_annuel,
     afficher_swi_mensuel,
     afficher_titre_swi
 )
-from modules.temperature import (
+from temperature import (
     pretraiter_temp_annuelle,
     pretraiter_temp_mensuel,
     afficher_temp_annuelle,
@@ -66,7 +66,7 @@ HTML_BANNER = """
 
 # --- Affichage du logo et du titre principal ---
 def afficher_entete():
-    file_path = "images/LOGO-vignette-turquoise.png"
+    file_path = "LOGO-vignette-turquoise.png"
     with open(file_path, "rb") as f:
         encoded_image = base64.b64encode(f.read()).decode()
 
@@ -110,23 +110,23 @@ def afficher_footer():
     col1, col2, col3, col4, col5, col6 = st.columns(6)
 
     with col1:
-        st.image("images/logo-cesaer.png", width=150)#, use_container_width=True
+        st.image("logo-cesaer.png", width=150)#, use_container_width=True
     with col2:
-        st.image("images/logo_iad.png", width=150)
+        st.image("logo_iad.png", width=150)
     with col3:
-        st.image("images/inrae.png", width=150)
+        st.image("inrae.png", width=150)
     with col4:
-        st.image("images/logo_CRC_transparent.png", width=150)
+        st.image("logo_CRC_transparent.png", width=150)
     with col5:
-        st.image("images/logo-UBE-footer.png", width=150)
+        st.image("logo-UBE-footer.png", width=150)
     with col6:
-        st.image("images/logo-cnrs.png", width=120)
+        st.image("logo-cnrs.png", width=120)
 
 # --- Chargement et nettoyage des données ---
 @st.cache_data
 def charger_donnees():
-    df_sim2 = pd.read_parquet("data/SIM2.parquet", engine="pyarrow")
-    df_ratio = pd.read_parquet("data/Ratio_Comm.parquet", engine="pyarrow")
+    df_sim2 = pd.read_parquet("SIM2.parquet", engine="pyarrow")
+    df_ratio = pd.read_parquet("Ratio_Comm.parquet", engine="pyarrow")
 
     df_sim2['time'] = pd.to_datetime(df_sim2['time'], errors='coerce')
     df_sim2['Year'] = pd.to_numeric(df_sim2['Year'], errors='coerce')
