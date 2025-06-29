@@ -97,17 +97,23 @@ def afficher_footer():
         st.image("logo-cnrs.png", width=120)
 
 # --- Chargement du fichier fusionné depuis Google Drive ---
-@st.cache_data
+@st.cache_data(show_spinner=True)
 def charger_donnees():
-    # URL Google Drive correcte pour gdown
-    url = "https://drive.google.com/uc?id=130L3lvx7uvbWt09WpXXr7OJsBuPJpkLr"
-    output = "dfsim2ratio.parquet"
-    gdown.download(url, output, quiet=False)
-    return pd.read_parquet(output)
+    # ID du fichier sur Google Drive
+    file_id = "130L3lvx7uvbWt09WpXXr7OJsBuPJpkLr"
+    url = f"https://drive.google.com/uc?id={file_id}"
+    if not os.path.exists("dfsim2ratio.parquet"):
+        response = requests.get(url)
+        response.raise_for_status()  # Déclenche une erreur si problème réseau
+        with open("dfsim2ratio.parquet", "wb") as f:
+            f.write(response.content)
+    return pd.read_parquet("dfsim2ratio.parquet", engine="pyarrow")
 
 @st.cache_data()
 def filtrer_commune(df, commune):
     return df[df["Nom_commun"] == commune].copy()
+
+
 
 # --- Application principale ---
 def main():
