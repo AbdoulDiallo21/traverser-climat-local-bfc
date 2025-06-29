@@ -96,12 +96,13 @@ def afficher_footer():
         st.image("logo-cnrs.png", width=120)
 
 # --- Chargement du fichier fusionné depuis Google Drive ---
-@st.cache_data()
+@st.cache_data
 def charger_donnees():
+    # Lien direct de téléchargement
     file_id = "130L3lvx7uvbWt09WpXXr7OJsBuPJpkLr"
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    url = f"https://drive.google.com/uc?id={file_id}"
     response = requests.get(url)
-    response.raise_for_status()
+    response.raise_for_status()  # pour détecter erreurs réseau
     parquet_data = io.BytesIO(response.content)
     return pd.read_parquet(parquet_data)
     
