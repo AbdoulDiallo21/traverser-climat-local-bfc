@@ -101,7 +101,7 @@ def afficher_footer():
 def charger_donnees():
     # URL Google Drive correcte pour gdown
     url = "https://drive.google.com/uc?id=130L3lvx7uvbWt09WpXXr7OJsBuPJpkLr"
-    output = "/tmp/data.parquet"
+    output = "dfsim2ratio.parquet"
     gdown.download(url, output, quiet=False)
     return pd.read_parquet(output)
 
