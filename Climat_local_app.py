@@ -96,6 +96,7 @@ def afficher_footer():
         st.image("logo-cnrs.png", width=120)
 
 # --- Chargement du fichier fusionné depuis Google Drive ---
+# --- Chargement du fichier fusionné depuis Google Drive ---
 @st.cache_data()
 def charger_donnees():
     file_id = "1I6aV6USh7SCVe5kqHyuyDOB2ot3Zu1I5"
