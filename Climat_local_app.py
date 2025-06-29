@@ -99,15 +99,18 @@ def afficher_footer():
 # --- Chargement du fichier fusionné depuis Google Drive ---
 @st.cache_data(show_spinner=True)
 def charger_donnees():
-    # ID du fichier sur Google Drive
     file_id = "130L3lvx7uvbWt09WpXXr7OJsBuPJpkLr"
-    url = f"https://drive.google.com/uc?id={file_id}"
-    if not os.path.exists("dfsim2ratio.parquet"):
-        response = requests.get(url)
-        response.raise_for_status()  # Déclenche une erreur si problème réseau
-        with open("dfsim2ratio.parquet", "wb") as f:
-            f.write(response.content)
-    return pd.read_parquet("dfsim2ratio.parquet", engine="pyarrow")
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+
+    response = requests.get(url)
+    response.raise_for_status()
+
+    # Vérification anti-fichier HTML
+    if b"<html" in response.content[:300].lower():
+        st.error("⚠️ Le lien Drive ne fournit pas un fichier .parquet valide. Vérifie les autorisations ou re-téléverse le fichier.")
+        st.stop()
+
+    return pd.read_parquet(io.BytesIO(response.content), engine="pyarrow")
 
 @st.cache_data()
 def filtrer_commune(df, commune):
