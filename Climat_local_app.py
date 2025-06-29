@@ -127,17 +127,31 @@ def afficher_footer():
 # --- Chargement et nettoyage des données ---
 @st.cache_data
 def charger_donnees():
-    df_sim2 = pd.read_parquet("SIM2.parquet", engine="pyarrow")
-    df_ratio = pd.read_parquet("Ratio_Comm.parquet", engine="pyarrow")
+    try:
+        # --- Chargement des fichiers ---
+        df_sim2 = pd.read_parquet("SIM2.parquet", engine="pyarrow")
+        df_ratio = pd.read_parquet("Ratio_Comm.parquet", engine="pyarrow")
 
-    df_sim2['time'] = pd.to_datetime(df_sim2['time'], errors='coerce')
-    df_sim2['Year'] = pd.to_numeric(df_sim2['Year'], errors='coerce')
-    df_sim2['Month'] = pd.to_numeric(df_sim2['Month'], errors='coerce')
-    df_sim2['ETP_Q'] = pd.to_numeric(df_sim2['ETP_Q'], errors='coerce')
-    df_sim2['P_ETP'] = pd.to_numeric(df_sim2['P_ETP'], errors='coerce')
+        # --- Nettoyage minimal ---
+        df_sim2['time'] = pd.to_datetime(df_sim2['time'], errors='coerce')
+        df_sim2['Year'] = pd.to_numeric(df_sim2['Year'], errors='coerce')
+        df_sim2['Month'] = pd.to_numeric(df_sim2['Month'], errors='coerce')
+        df_sim2['ETP_Q'] = pd.to_numeric(df_sim2['ETP_Q'], errors='coerce')
+        df_sim2['P_ETP'] = pd.to_numeric(df_sim2['P_ETP'], errors='coerce')
 
-    df = df_sim2.merge(df_ratio[['idPoint', 'Nom_commun', 'Ratio_Comm']], on='idPoint', how='left')
-    return df
+        # --- Fusion avec table de correspondance communes ---
+        df = df_sim2.merge(
+            df_ratio[['idPoint', 'Nom_commun', 'Ratio_Comm']],
+            on='idPoint', how='left'
+        )
+        return df
+
+    except FileNotFoundError as e:
+        st.error(f"❌ Fichier manquant : {e.filename}")
+        st.stop()
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement des données : {e}")
+        st.stop()
 
 # --- Application principale ---
 def main():
