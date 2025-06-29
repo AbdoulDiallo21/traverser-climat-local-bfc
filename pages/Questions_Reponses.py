@@ -1,6 +1,6 @@
 import streamlit as st
 # Configuration de la page
-#st.set_page_config(page_title="", layout="wide")
+st.set_page_config(page_title="Questions_Réponses", layout="wide")
 # EN-TÊTE
 st.markdown("""
 <div style="background-color:#00a3a6;padding:10px;border-radius:8px;">
