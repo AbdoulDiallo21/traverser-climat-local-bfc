@@ -198,8 +198,8 @@ def main():
             an_min, an_max = int(df['Year'].min()), int(df['Year'].max())
             periode = st.slider("Période", min_value=an_min, max_value=an_max, value=(an_min, an_max), step=1)
 
-            if periode[1] - periode[0] < 5:
-                st.error("⛔ Veuillez sélectionner une période d'au moins 5 ans.")
+            if periode[1] - periode[0] < 3:
+                st.error("⛔ Veuillez sélectionner une période d'au moins 3 ans.")
                 st.stop()
 
             afficher_reference = st.checkbox("📌 Période de référence (1959–1987)", value=True)
