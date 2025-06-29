@@ -15,6 +15,7 @@ import streamlit as st
 from streamlit.components.v1 import html
 from streamlit_option_menu import option_menu
 import base64
+import requests
 from PIL import Image
 # --- ⚠️ Configuration Streamlit (à mettre tout en haut) ---
 st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
@@ -128,9 +129,19 @@ def afficher_footer():
 @st.cache_data
 def charger_donnees():
     try:
-        # --- Chargement des fichiers ---
-        df_sim2 = pd.read_parquet("SIM2.parquet", engine="pyarrow")
-        df_ratio = pd.read_parquet("Ratio_Comm.parquet", engine="pyarrow")
+        # --- Liens Google Drive (convertis en téléchargement direct) ---
+        url_sim2 = "https://drive.google.com/uc?id=1S_4UV2_IeI3Wr08-JObRxx9_RGzriNql"
+        url_ratio = "https://drive.google.com/uc?id=1uUkd8D_JAKR_dfpDzpSyBcg22IBh2Yrt"  
+
+        # --- Téléchargement SIM2.parquet ---
+        response_sim2 = requests.get(url_sim2)
+        response_sim2.raise_for_status()
+        df_sim2 = pd.read_parquet(io.BytesIO(response_sim2.content), engine="pyarrow")
+
+        # --- Téléchargement Ratio_Comm.parquet ---
+        response_ratio = requests.get(url_ratio)
+        response_ratio.raise_for_status()
+        df_ratio = pd.read_parquet(io.BytesIO(response_ratio.content), engine="pyarrow")
 
         # --- Nettoyage minimal ---
         df_sim2['time'] = pd.to_datetime(df_sim2['time'], errors='coerce')
@@ -144,10 +155,11 @@ def charger_donnees():
             df_ratio[['idPoint', 'Nom_commun', 'Ratio_Comm']],
             on='idPoint', how='left'
         )
+
         return df
 
-    except FileNotFoundError as e:
-        st.error(f"❌ Fichier manquant : {e.filename}")
+    except requests.exceptions.RequestException as e:
+        st.error(f"❌ Erreur de téléchargement depuis Google Drive : {e}")
         st.stop()
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement des données : {e}")
