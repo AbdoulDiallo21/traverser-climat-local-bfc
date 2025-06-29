@@ -116,8 +116,6 @@ def charger_donnees():
 def filtrer_commune(df, commune):
     return df[df["Nom_commun"] == commune].copy()
 
-
-
 # --- Application principale ---
 def main():
     #st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
@@ -193,14 +191,15 @@ def main():
         df_commune = df[df['Nom_commun'] == selected_commune]
 
         if selected_indicateur == "ETP_Q":
-            resumyear = pretraiter_etp_annuelle(df)
-            df_monthly = pretraiter_etp_mensuel(df, an_debut=periode[0], an_fin=periode[1])
-            rcycle = calculer_etp_mensuel_commune(df_monthly, df, selected_commune)
-
+            # --- Prétraitement annuel & mensuel sur la commune sélectionnée ---
+            resumyear = pretraiter_etp_annuelle(df_commune)
+            df_monthly = pretraiter_etp_mensuel(df_commune, an_debut=periode[0], an_fin=periode[1])
+            rcycle = calculer_etp_mensuel_commune(df_monthly, df_commune)
+            
             rcycle_ref = None
             if afficher_reference:
                 df_ref_mensuel = pretraiter_etp_mensuel(df, an_debut=1959, an_fin=1987)
-                rcycle_ref = calculer_etp_mensuel_commune(df_ref_mensuel, df, selected_commune)
+                rcycle_ref = calculer_etp_mensuel_commune(df_ref_mensuel, df_commune)
 
             afficher_titre_etp(selected_commune)
             col1, col2 = st.columns(2)
