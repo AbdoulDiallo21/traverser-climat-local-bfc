@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import io
 import os
+os.environ["WATCHDOG_DISABLE_FILE_WATCHING"] = "true"
 import requests
 import time
 import calendar
@@ -33,35 +34,35 @@ from etp import (
     afficher_titre_etp,
     afficher_simulateur_etp
 )
-# from petp import (
-#     pretraiter_bilan_annuelle,
-#     pretraiter_bilan_mensuel,
-#     afficher_bilan_annuelle,
-#     afficher_bilan_mensuel,
-#     afficher_titre_petp,
-# )
+from petp import (
+    pretraiter_bilan_annuelle,
+    pretraiter_bilan_mensuel,
+    afficher_bilan_annuelle,
+    afficher_bilan_mensuel,
+    afficher_titre_petp,
+)
 
-# from precip import (
-#     pretraiter_precip_annuelle,
-#     pretraiter_precip_mensuel,
-#     afficher_precip_annuelle,
-#     afficher_precip_mensuel,
-#     afficher_titre_precip
-# )
-# from swi import (
-#     pretraiter_swi_annuel,
-#     pretraiter_swi_mensuel,
-#     afficher_swi_annuel,
-#     afficher_swi_mensuel,
-#     afficher_titre_swi
-# )
-# from temperature import (
-#     pretraiter_temp_annuelle,
-#     pretraiter_temp_mensuel,
-#     afficher_temp_annuelle,
-#     afficher_temp_mensuel,
-#     afficher_titre_temp
-# )
+from precip import (
+    pretraiter_precip_annuelle,
+    pretraiter_precip_mensuel,
+    afficher_precip_annuelle,
+    afficher_precip_mensuel,
+    afficher_titre_precip
+)
+from swi import (
+    pretraiter_swi_annuel,
+    pretraiter_swi_mensuel,
+    afficher_swi_annuel,
+    afficher_swi_mensuel,
+    afficher_titre_swi
+)
+from temperature import (
+    pretraiter_temp_annuelle,
+    pretraiter_temp_mensuel,
+    afficher_temp_annuelle,
+    afficher_temp_mensuel,
+    afficher_titre_temp
+)
 
 # --- Habillage titre ---
 HTML_BANNER = """
@@ -275,92 +276,92 @@ def main():
                 """, unsafe_allow_html=True)
             
         # ### PETP
-        # elif selected_indicateur == "P_ETP":
-        #     resumyear_bilan = pretraiter_bilan_annuelle(df, an_debut=periode[0], an_fin=periode[1])
-        #     resummonth_bilan = pretraiter_bilan_mensuel(df, an_debut=periode[0], an_fin=periode[1])
+        elif selected_indicateur == "P_ETP":
+            resumyear_bilan = pretraiter_bilan_annuelle(df, an_debut=periode[0], an_fin=periode[1])
+            resummonth_bilan = pretraiter_bilan_mensuel(df, an_debut=periode[0], an_fin=periode[1])
 
-        #     resum_ref_bilan = None
-        #     resummonth_ref_bilan = None
-        #     if afficher_reference:
-        #         resum_ref_bilan = pretraiter_bilan_annuelle(df, an_debut=1959, an_fin=1987)
-        #         resummonth_ref_bilan = pretraiter_bilan_mensuel(df, an_debut=1959, an_fin=1987)
+            resum_ref_bilan = None
+            resummonth_ref_bilan = None
+            if afficher_reference:
+                resum_ref_bilan = pretraiter_bilan_annuelle(df, an_debut=1959, an_fin=1987)
+                resummonth_ref_bilan = pretraiter_bilan_mensuel(df, an_debut=1959, an_fin=1987)
 
-        #     afficher_titre_petp(selected_commune)
-        #     col1, col2 = st.columns(2)
-        #     with col1:
-        #         afficher_bilan_mensuel(resummonth_bilan, df_ratio=df, nom_commune=selected_commune, an_debut=periode[0], an_fin=periode[1], df_month_ref=resummonth_ref_bilan)
-        #     with col2:
-        #         afficher_bilan_annuelle(resumyear_bilan, df, nom_commune=selected_commune,an_debut=periode[0], an_fin=periode[1],an_reference=afficher_reference, periode_ref=(1959, 1987),resum_ref=resum_ref_bilan)
-        #         st.markdown("""
-        #         <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
-        #         """, unsafe_allow_html=True)
+            afficher_titre_petp(selected_commune)
+            col1, col2 = st.columns(2)
+            with col1:
+                afficher_bilan_mensuel(resummonth_bilan, df_ratio=df, nom_commune=selected_commune, an_debut=periode[0], an_fin=periode[1], df_month_ref=resummonth_ref_bilan)
+            with col2:
+                afficher_bilan_annuelle(resumyear_bilan, df, nom_commune=selected_commune,an_debut=periode[0], an_fin=periode[1],an_reference=afficher_reference, periode_ref=(1959, 1987),resum_ref=resum_ref_bilan)
+                st.markdown("""
+                <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
+                """, unsafe_allow_html=True)
         
         # ### PRECIP
-        # elif selected_indicateur == "PRECIP":
-        #     resumyear = pretraiter_precip_annuelle(df, an_debut=periode[0], an_fin=periode[1])
-        #     df_monthly = pretraiter_precip_mensuel(df, an_debut=periode[0], an_fin=periode[1])
+        elif selected_indicateur == "PRECIP":
+            resumyear = pretraiter_precip_annuelle(df, an_debut=periode[0], an_fin=periode[1])
+            df_monthly = pretraiter_precip_mensuel(df, an_debut=periode[0], an_fin=periode[1])
 
-            # df_ref_monthly = None
-            # resum_ref = None
-            # if afficher_reference:
-            #     df_ref_monthly = pretraiter_precip_mensuel(df, an_debut=1959, an_fin=1987)
-            #     resum_ref = pretraiter_precip_annuelle(df, an_debut=1959, an_fin=1987)
+            df_ref_monthly = None
+            resum_ref = None
+            if afficher_reference:
+                df_ref_monthly = pretraiter_precip_mensuel(df, an_debut=1959, an_fin=1987)
+                resum_ref = pretraiter_precip_annuelle(df, an_debut=1959, an_fin=1987)
 
-            # afficher_titre_precip(selected_commune)
-            # col1, col2 = st.columns(2)
-            # with col1:
-            #     afficher_precip_mensuel(df_monthly,df,nom_commune=selected_commune,an_debut=periode[0],an_fin=periode[1],df_month_ref=df_ref_monthly)
-            # with col2:
-            #     afficher_precip_annuelle(resumyear,df,nom_commune=selected_commune,an_debut=periode[0],an_fin=periode[1],an_reference=afficher_reference,periode_ref=(1959, 1987),resum_ref=resum_ref)
-            #     st.markdown("""
-            #     <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
-            #     """, unsafe_allow_html=True)
+            afficher_titre_precip(selected_commune)
+            col1, col2 = st.columns(2)
+            with col1:
+                afficher_precip_mensuel(df_monthly,df,nom_commune=selected_commune,an_debut=periode[0],an_fin=periode[1],df_month_ref=df_ref_monthly)
+            with col2:
+                afficher_precip_annuelle(resumyear,df,nom_commune=selected_commune,an_debut=periode[0],an_fin=periode[1],an_reference=afficher_reference,periode_ref=(1959, 1987),resum_ref=resum_ref)
+                st.markdown("""
+                <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
+                """, unsafe_allow_html=True)
         
         # ### SWI
-        # elif selected_indicateur == "SWI":
-        #     # Prétraitements principal
-        #     resum_swi = pretraiter_swi_annuel(df, an_debut=periode[0], an_fin=periode[1])
-        #     df_swi_mensuel = pretraiter_swi_mensuel(df, an_debut=periode[0], an_fin=periode[1])
+        elif selected_indicateur == "SWI":
+            # Prétraitements principal
+            resum_swi = pretraiter_swi_annuel(df, an_debut=periode[0], an_fin=periode[1])
+            df_swi_mensuel = pretraiter_swi_mensuel(df, an_debut=periode[0], an_fin=periode[1])
 
-        #     # Initialisation des références
-        #     df_ref_mensuel_swi = None
-        #     resum_ref_swi = None
+            # Initialisation des références
+            df_ref_mensuel_swi = None
+            resum_ref_swi = None
 
-        #     if afficher_reference:
-        #         df_ref_mensuel_swi = pretraiter_swi_mensuel(df, an_debut=1959, an_fin=1987)
-        #         resum_ref_swi = pretraiter_swi_annuel(df, an_debut=1959, an_fin=1987)
-        #     afficher_titre_swi(selected_commune)
+            if afficher_reference:
+                df_ref_mensuel_swi = pretraiter_swi_mensuel(df, an_debut=1959, an_fin=1987)
+                resum_ref_swi = pretraiter_swi_annuel(df, an_debut=1959, an_fin=1987)
+            afficher_titre_swi(selected_commune)
 
-            # col1, col2 = st.columns(2)
-            # with col1:
-            #     afficher_swi_mensuel(df_month=df_swi_mensuel,df_ratio=df,nom_commune=selected_commune,an_debut=periode[0],an_fin=periode[1],df_month_ref=df_ref_mensuel_swi)
-            # with col2:
-            #     afficher_swi_annuel(resumyear=resum_swi,df=df,nom_commune=selected_commune,an_debut=periode[0],an_fin=periode[1],periode_ref=(1959, 1987),resum_ref=resum_ref_swi)
-            #     st.markdown("""
-            #     <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
-            #     """, unsafe_allow_html=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                afficher_swi_mensuel(df_month=df_swi_mensuel,df_ratio=df,nom_commune=selected_commune,an_debut=periode[0],an_fin=periode[1],df_month_ref=df_ref_mensuel_swi)
+            with col2:
+                afficher_swi_annuel(resumyear=resum_swi,df=df,nom_commune=selected_commune,an_debut=periode[0],an_fin=periode[1],periode_ref=(1959, 1987),resum_ref=resum_ref_swi)
+                st.markdown("""
+                <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
+                """, unsafe_allow_html=True)
 
         # ### TEMP  
-        # elif selected_indicateur == "TEMP":
-        #     resumyear = pretraiter_temp_annuelle(df, an_debut=periode[0], an_fin=periode[1])
-        #     df_monthly = pretraiter_temp_mensuel(df, an_debut=periode[0], an_fin=periode[1])
-        #     rcycle = df_monthly 
+        elif selected_indicateur == "TEMP":
+            resumyear = pretraiter_temp_annuelle(df, an_debut=periode[0], an_fin=periode[1])
+            df_monthly = pretraiter_temp_mensuel(df, an_debut=periode[0], an_fin=periode[1])
+            rcycle = df_monthly 
 
-        #     rcycle_ref = None
-        #     resum_ref = None
-        #     if afficher_reference:
-        #         resum_ref = pretraiter_temp_annuelle(df, an_debut=1959, an_fin=1987)
-        #         rcycle_ref = pretraiter_temp_mensuel(df, an_debut=1959, an_fin=1987)
+            rcycle_ref = None
+            resum_ref = None
+            if afficher_reference:
+                resum_ref = pretraiter_temp_annuelle(df, an_debut=1959, an_fin=1987)
+                rcycle_ref = pretraiter_temp_mensuel(df, an_debut=1959, an_fin=1987)
 
-            # afficher_titre_temp(selected_commune)
-            # col1, col2 = st.columns(2)
-            # with col1:
-            #     afficher_temp_mensuel(rcycle, df, selected_commune, an_debut=periode[0], an_fin=periode[1], df_month_ref=rcycle_ref)
-            # with col2:
-            #     afficher_temp_annuelle(resumyear, df, selected_commune,an_debut=periode[0], an_fin=periode[1],an_reference=afficher_reference,periode_ref=(1959, 1987),resum_ref=resum_ref)
-            #     st.markdown("""
-            #     <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
-            #     """, unsafe_allow_html=True)
+            afficher_titre_temp(selected_commune)
+            col1, col2 = st.columns(2)
+            with col1:
+                afficher_temp_mensuel(rcycle, df, selected_commune, an_debut=periode[0], an_fin=periode[1], df_month_ref=rcycle_ref)
+            with col2:
+                afficher_temp_annuelle(resumyear, df, selected_commune,an_debut=periode[0], an_fin=periode[1],an_reference=afficher_reference,periode_ref=(1959, 1987),resum_ref=resum_ref)
+                st.markdown("""
+                <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
+                """, unsafe_allow_html=True)
 
         # Appel du footer à la fin de la page
         afficher_footer()
