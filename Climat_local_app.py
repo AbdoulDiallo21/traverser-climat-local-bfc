@@ -129,42 +129,54 @@ def afficher_footer():
         st.image("logo-cnrs.png", width=120)
 
 # --- Chargement et nettoyage des données ---
-@st.cache_data
+@st.cache_resource
 def charger_donnees():
     try:
+        # URLs des fichiers sources
         url_sim2 = "https://drive.google.com/uc?export=download&id=1S_4UV2_IeI3Wr08-JObRxx9_RGzriNql"
         url_ratio = "https://drive.google.com/uc?export=download&id=1uUkd8D_JAKR_dfpDzpSyBcg22IBh2Yrt"
 
-        if not os.path.exists("SIM2.parquet"):
+        # Fichiers locaux
+        fichier_sim2 = "SIM2.parquet"
+        fichier_ratio = "Ratio_Comm.parquet"
+
+        # Téléchargement conditionnel
+        if not os.path.exists(fichier_sim2):
             response = requests.get(url_sim2)
-            with open("SIM2.parquet", "wb") as f:
+            response.raise_for_status()  # En cas d’erreur réseau
+            with open(fichier_sim2, "wb") as f:
                 f.write(response.content)
 
-        if not os.path.exists("Ratio_Comm.parquet"):
+        if not os.path.exists(fichier_ratio):
             response = requests.get(url_ratio)
-            with open("Ratio_Comm.parquet", "wb") as f:
+            response.raise_for_status()
+            with open(fichier_ratio, "wb") as f:
                 f.write(response.content)
 
-        df_sim2 = pd.read_parquet("SIM2.parquet", engine="pyarrow")
-        df_ratio = pd.read_parquet("Ratio_Comm.parquet", engine="pyarrow")
+        # Lecture
+        df_sim2 = pd.read_parquet(fichier_sim2, engine="pyarrow")
+        df_ratio = pd.read_parquet(fichier_ratio, engine="pyarrow")
 
         # Nettoyage
+        df_sim2 = df_sim2.copy()
         df_sim2['time'] = pd.to_datetime(df_sim2['time'], errors='coerce')
-        df_sim2['Year'] = pd.to_numeric(df_sim2['Year'], errors='coerce')
-        df_sim2['Month'] = pd.to_numeric(df_sim2['Month'], errors='coerce')
-        df_sim2['ETP_Q'] = pd.to_numeric(df_sim2['ETP_Q'], errors='coerce')
-        df_sim2['P_ETP'] = pd.to_numeric(df_sim2['P_ETP'], errors='coerce')
+        for col in ['Year', 'Month', 'ETP_Q', 'P_ETP']:
+            if col in df_sim2.columns:
+                df_sim2[col] = pd.to_numeric(df_sim2[col], errors='coerce')
 
-        df = pd.merge(df_sim2,
+        # Fusion
+        df = pd.merge(
+            df_sim2,
             df_ratio[['idPoint', 'Nom_commun', 'Ratio_Comm']],
-            on='idPoint', how='right'
+            on='idPoint',
+            how='right'  # ou 'left' selon ton besoin réel
         )
+
         return df
 
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement des données : {e}")
         st.stop()
-
 # --- Application principale ---
 def main():
     #st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
