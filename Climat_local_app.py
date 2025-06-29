@@ -100,7 +100,7 @@ def afficher_footer():
 def charger_donnees():
     file_id = "1I6aV6USh7SCVe5kqHyuyDOB2ot3Zu1I5"
     url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    fichier_local = "data/Donnees_Climat_Merge.parquet"
+    fichier_local = "dfsim2ratio.parquet"
 
     if not os.path.exists(fichier_local):
         response = requests.get(url)
