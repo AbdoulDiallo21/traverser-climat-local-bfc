@@ -5,6 +5,7 @@
 import numpy as np
 import pandas as pd
 import io
+import os
 import requests
 import time
 import calendar
@@ -131,38 +132,35 @@ def afficher_footer():
 @st.cache_data
 def charger_donnees():
     try:
-        # --- Liens Google Drive (convertis en téléchargement direct) ---
         url_sim2 = "https://drive.google.com/uc?export=download&id=1S_4UV2_IeI3Wr08-JObRxx9_RGzriNql"
-        url_ratio = "https://drive.google.com/uc?export=download&id=1uUkd8D_JAKR_dfpDzpSyBcg22IBh2Yrt"  
+        url_ratio = "https://drive.google.com/uc?export=download&id=1uUkd8D_JAKR_dfpDzpSyBcg22IBh2Yrt"
 
-        # --- Téléchargement SIM2.parquet ---
-        response_sim2 = requests.get(url_sim2)
-        response_sim2.raise_for_status()
-        df_sim2 = pd.read_parquet(io.BytesIO(response_sim2.content), engine="pyarrow")
+        if not os.path.exists("SIM2.parquet"):
+            response = requests.get(url_sim2)
+            with open("SIM2.parquet", "wb") as f:
+                f.write(response.content)
 
-        # --- Téléchargement Ratio_Comm.parquet ---
-        response_ratio = requests.get(url_ratio)
-        response_ratio.raise_for_status()
-        df_ratio = pd.read_parquet(io.BytesIO(response_ratio.content), engine="pyarrow")
+        if not os.path.exists("Ratio_Comm.parquet"):
+            response = requests.get(url_ratio)
+            with open("Ratio_Comm.parquet", "wb") as f:
+                f.write(response.content)
 
-        # --- Nettoyage minimal ---
+        df_sim2 = pd.read_parquet("SIM2.parquet", engine="pyarrow")
+        df_ratio = pd.read_parquet("Ratio_Comm.parquet", engine="pyarrow")
+
+        # Nettoyage
         df_sim2['time'] = pd.to_datetime(df_sim2['time'], errors='coerce')
         df_sim2['Year'] = pd.to_numeric(df_sim2['Year'], errors='coerce')
         df_sim2['Month'] = pd.to_numeric(df_sim2['Month'], errors='coerce')
         df_sim2['ETP_Q'] = pd.to_numeric(df_sim2['ETP_Q'], errors='coerce')
         df_sim2['P_ETP'] = pd.to_numeric(df_sim2['P_ETP'], errors='coerce')
 
-        # --- Fusion avec table de correspondance communes ---
         df = df_sim2.merge(
             df_ratio[['idPoint', 'Nom_commun', 'Ratio_Comm']],
             on='idPoint', how='left'
         )
-
         return df
 
-    except requests.exceptions.RequestException as e:
-        st.error(f"❌ Erreur de téléchargement depuis Google Drive : {e}")
-        st.stop()
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement des données : {e}")
         st.stop()
