@@ -132,8 +132,8 @@ def afficher_footer():
 def charger_donnees():
     try:
         # --- Liens Google Drive (convertis en téléchargement direct) ---
-        url_sim2 = "https://drive.google.com/uc?id=1S_4UV2_IeI3Wr08-JObRxx9_RGzriNql"
-        url_ratio = "https://drive.google.com/uc?id=1uUkd8D_JAKR_dfpDzpSyBcg22IBh2Yrt"  
+        url_sim2 = "https://drive.google.com/uc?export=download&id=1S_4UV2_IeI3Wr08-JObRxx9_RGzriNql"
+        url_ratio = "https://drive.google.com/uc?export=download&id=1uUkd8D_JAKR_dfpDzpSyBcg22IBh2Yrt"  
 
         # --- Téléchargement SIM2.parquet ---
         response_sim2 = requests.get(url_sim2)
