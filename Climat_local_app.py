@@ -104,7 +104,7 @@ def charger_donnees():
     response.raise_for_status()
     parquet_data = io.BytesIO(response.content)
     return pd.read_parquet(parquet_data)
-
+    
 @st.cache_data()
 def filtrer_commune(df, commune):
     return df[df["Nom_commun"] == commune].copy()
