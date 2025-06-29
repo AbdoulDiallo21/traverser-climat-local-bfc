@@ -99,18 +99,16 @@ def afficher_footer():
 # --- Chargement du fichier fusionné depuis Google Drive ---
 @st.cache_data()
 def charger_donnees():
-    file_id = "1I6aV6USh7SCVe5kqHyuyDOB2ot3Zu1I5"
+    file_id = "130L3lvx7uvbWt09WpXXr7OJsBuPJpkLr"
     url = f"https://drive.google.com/uc?export=download&id={file_id}"
     fichier_local = "dfsim2ratio.parquet"
-
     if not os.path.exists(fichier_local):
         response = requests.get(url)
         response.raise_for_status()
         with open(fichier_local, "wb") as f:
             f.write(response.content)
-
     return pd.read_parquet(fichier_local)
-
+    
 @st.cache_data()
 def filtrer_commune(df, commune):
     return df[df["Nom_commun"] == commune].copy()
