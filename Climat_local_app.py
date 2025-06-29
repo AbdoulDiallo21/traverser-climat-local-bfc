@@ -155,9 +155,9 @@ def charger_donnees():
         df_sim2['ETP_Q'] = pd.to_numeric(df_sim2['ETP_Q'], errors='coerce')
         df_sim2['P_ETP'] = pd.to_numeric(df_sim2['P_ETP'], errors='coerce')
 
-        df = df_sim2.merge(
+        df = pd.merge(df_sim2,
             df_ratio[['idPoint', 'Nom_commun', 'Ratio_Comm']],
-            on='idPoint', how='left'
+            on='idPoint', how='right'
         )
         return df
 
