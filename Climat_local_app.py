@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import io
 import os
-os.environ["WATCHDOG_DISABLE_FILE_WATCHING"] = "true"
 import requests
 import time
 import calendar
@@ -130,7 +129,7 @@ def afficher_footer():
         st.image("logo-cnrs.png", width=120)
 
 # --- Chargement et nettoyage des données ---
-@st.cache_resource
+@st.cache_data()
 def charger_donnees():
     try:
         # URLs des fichiers sources
