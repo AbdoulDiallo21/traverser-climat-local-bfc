@@ -1,21 +1,22 @@
+# petp.py
+
 import numpy as np
 import pandas as pd
 import calendar
 import plotly.graph_objects as go
 import streamlit as st
 from statsmodels.nonparametric.smoothers_lowess import lowess
-from matplotlib.ticker import MaxNLocator
 import warnings
 
 # --- 1. Prétraitement annuel ---
 @st.cache_data
-def pretraiter_bilan_annuelle(df, an_debut, an_fin):
+def pretraiter_bilan_annuelle(df_commune, an_debut, an_fin):
     resumyear = []
-    df['date'] = pd.to_datetime(df['time'], errors='coerce')
-    df['P_ETP'] = pd.to_numeric(df['P_ETP'], errors='coerce')
-    df = df[df['date'].dt.year.between(an_debut, an_fin)]
+    df_commune['date'] = pd.to_datetime(df_commune['time'], errors='coerce')
+    df_commune['P_ETP'] = pd.to_numeric(df_commune['P_ETP'], errors='coerce')
+    df_commune = df_commune[df_commune['date'].dt.year.between(an_debut, an_fin)]
 
-    for idp, group in df.groupby("idPoint"):
+    for idp, group in df_commune.groupby("idPoint"):
         annual = group.set_index("date").resample("YE")["P_ETP"].sum(min_count=1)
         df_tmp = pd.DataFrame({
             "year": annual.index.year,
@@ -27,8 +28,8 @@ def pretraiter_bilan_annuelle(df, an_debut, an_fin):
     return pd.concat(resumyear, ignore_index=True)
 
 # --- 2. Affichage annuel ---
-def afficher_bilan_annuelle(resumyear, df, nom_commune, an_debut=1959, an_fin=2024, an_reference=True, periode_ref=(1959, 1987), resum_ref=None):
-    tmpcomm = df[df["Nom_commun"] == nom_commune][["idPoint", "Ratio_Comm"]]
+def afficher_bilan_annuelle(resumyear, df_commune, nom_commune, an_debut=1959, an_fin=2024, an_reference=True, periode_ref=(1959, 1987), resum_ref=None):
+    tmpcomm = df_commune[['idPoint', 'Ratio_Comm']].drop_duplicates()
     test = pd.merge(resumyear, tmpcomm, on="idPoint")
     test["P_ETP_p"] = test["P_ETP"] * test["Ratio_Comm"]
     test["year"] = test["year"].astype(int)
@@ -85,8 +86,9 @@ def afficher_bilan_annuelle(resumyear, df, nom_commune, an_debut=1959, an_fin=20
 
 # --- 3. Prétraitement mensuel ---
 @st.cache_data
-def pretraiter_bilan_mensuel(df, an_debut, an_fin):
+def pretraiter_bilan_mensuel(df_commune, an_debut, an_fin):
     resummonth = []
+    df = df_commune.copy()
     df['date'] = pd.to_datetime(df['time'], errors='coerce')
     df['P_ETP'] = pd.to_numeric(df['P_ETP'], errors='coerce')
     df['year'] = df['date'].dt.year
@@ -96,10 +98,6 @@ def pretraiter_bilan_mensuel(df, an_debut, an_fin):
 
     for idP in df['idPoint'].unique():
         tmp = df[df['idPoint'] == idP].copy()
-
-        if tmp['P_ETP'].isna().sum() > 0:
-            warnings.warn(f"Valeurs NA détectées pour idPoint = {idP}")
-
         tmp = tmp.dropna(subset=['P_ETP'])
         tmp = tmp.set_index('date')
 
@@ -116,9 +114,9 @@ def pretraiter_bilan_mensuel(df, an_debut, an_fin):
     return pd.concat(resummonth, ignore_index=True)
 
 # --- 4. Affichage mensuel ---
-def afficher_bilan_mensuel(resummonth, df_ratio, nom_commune, an_debut, an_fin, df_month_ref=None):
+def afficher_bilan_mensuel(resummonth, df_commune, nom_commune, an_debut, an_fin, df_month_ref=None):
     month_abb = list(calendar.month_abbr)[1:]
-    tmpcomm = df_ratio[df_ratio['Nom_commun'] == nom_commune][['idPoint', 'Ratio_Comm']]
+    tmpcomm = df_commune[['idPoint', 'Ratio_Comm']].drop_duplicates()
     test = pd.merge(resummonth, tmpcomm, on='idPoint')
     test['P_ETPp'] = test['P_ETP'] * test['Ratio_Comm']
 
@@ -186,8 +184,7 @@ def afficher_bilan_mensuel(resummonth, df_ratio, nom_commune, an_debut, an_fin, 
 
     st.plotly_chart(fig, use_container_width=True)
 
-
-# --- 6. Titre général pour affichage combiné ---
+# --- 5. Titre général ---
 def afficher_titre_petp(nom_commune):
     st.markdown(
         f"""
@@ -217,4 +214,3 @@ def afficher_titre_petp(nom_commune):
         """,
         unsafe_allow_html=True
     )
-
