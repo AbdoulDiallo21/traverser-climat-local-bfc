@@ -25,11 +25,44 @@ from PIL import Image
 st.set_page_config(page_title="Visualisation Climat", layout="wide", initial_sidebar_state="expanded")
 
 # --- Import modules personnalisés ---
-from etp import *
-from petp import *
-from precip import *
-from swi import *
-from temperature import *
+from etp import (
+    pretraiter_etp_annuelle,
+    pretraiter_etp_mensuel,
+    afficher_etp_annuelle,
+    afficher_etp_mensuel,
+    calculer_etp_mensuel_commune,
+    afficher_titre_etp,
+    afficher_simulateur_etp
+)
+from petp import (
+    pretraiter_bilan_annuelle,
+     pretraiter_bilan_mensuel,
+    afficher_bilan_annuelle,
+    afficher_bilan_mensuel,
+    afficher_titre_petp,
+)
+
+from precip import (
+    pretraiter_precip_annuelle,
+    pretraiter_precip_mensuel,
+    afficher_precip_annuelle,
+    afficher_precip_mensuel,
+    afficher_titre_precip
+)
+from swi import (
+    pretraiter_swi_annuel,
+    pretraiter_swi_mensuel,
+    afficher_swi_annuel,
+    afficher_swi_mensuel,
+    afficher_titre_swi
+)
+from temperature import (
+    pretraiter_temp_annuelle,
+    pretraiter_temp_mensuel,
+    afficher_temp_annuelle,
+    afficher_temp_mensuel,
+    afficher_titre_temp
+)
 
 # --- Habillage titre ---
 HTML_BANNER = """
