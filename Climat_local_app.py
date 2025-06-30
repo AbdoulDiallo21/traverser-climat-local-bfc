@@ -96,22 +96,45 @@ def afficher_footer():
     with col6:
         st.image("logo-cnrs.png", width=120)
 
-# --- Chargement du fichier fusionné depuis Google Drive ---
+# --- Chargement des fichiers SIM2 et Ratio_Comm depuis Google Drive ---
 @st.cache_data(show_spinner=True)
 def charger_donnees():
-    file_id = "130L3lvx7uvbWt09WpXXr7OJsBuPJpkLr"
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    # Liens Drive
+    url_sim2 = "https://drive.google.com/uc?export=download&id=1_IkW7fIdLaDWNCV9whbyfk7xrBsihfjs"
+    url_ratio = "https://drive.google.com/uc?export=download&id=1bslDQWjRQ0OjR0VnDcJFcSPUG67UGdap"
 
-    response = requests.get(url)
-    response.raise_for_status()
-
-    # Vérification anti-fichier HTML
-    if b"<html" in response.content[:300].lower():
-        st.error("⚠️ Le lien Drive ne fournit pas un fichier .parquet valide. Vérifie les autorisations ou re-téléverse le fichier.")
+    # --- Téléchargement fichiers
+    r1 = requests.get(url_sim2)
+    r1.raise_for_status()
+    if b"<html" in r1.content[:300].lower():
+        st.error("⚠️ Le lien SIM2 ne fournit pas un fichier Parquet valide.")
         st.stop()
+    df_sim2 = pd.read_parquet(io.BytesIO(r1.content), engine="pyarrow")
 
-    return pd.read_parquet(io.BytesIO(response.content), engine="pyarrow")
+    r2 = requests.get(url_ratio)
+    r2.raise_for_status()
+    if b"<html" in r2.content[:300].lower():
+        st.error("⚠️ Le lien Ratio_Comm ne fournit pas un fichier Parquet valide.")
+        st.stop()
+    df_ratio = pd.read_parquet(io.BytesIO(r2.content), engine="pyarrow")
 
+    # --- Nettoyage
+    df_sim2['time'] = pd.to_datetime(df_sim2['time'], errors='coerce')
+    df_sim2['Year'] = pd.to_numeric(df_sim2['Year'], errors='coerce')
+    df_sim2['Month'] = pd.to_numeric(df_sim2['Month'], errors='coerce')
+    df_sim2['ETP_Q'] = pd.to_numeric(df_sim2['ETP_Q'], errors='coerce')
+    df_sim2['P_ETP'] = pd.to_numeric(df_sim2['P_ETP'], errors='coerce')
+
+    # --- Fusion des deux tables
+    df = df_sim2.merge(
+        df_ratio[['idPoint', 'Nom_commun', 'Ratio_Comm']],
+        on='idPoint',
+        how='left'
+    )
+
+    return df
+
+# --- Filtrage d'une commune spécifique
 @st.cache_data()
 def filtrer_commune(df, commune):
     return df[df["Nom_commun"] == commune].copy()
@@ -173,7 +196,6 @@ def main():
                 </div>
                 """, unsafe_allow_html=True)
             
-    
             an_min, an_max = int(df['Year'].min()), int(df['Year'].max())
             periode = st.slider("Période", min_value=an_min, max_value=an_max, value=(an_min, an_max), step=1)
 
