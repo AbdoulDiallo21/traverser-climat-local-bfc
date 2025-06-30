@@ -335,26 +335,29 @@ def main():
                 <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
                 """, unsafe_allow_html=True)
 
-        # ### TEMP  
+        # --- TEMP ---
         elif selected_indicateur == "TEMP":
+            # --- Prétraitements température
             resumyear = pretraiter_temp_annuelle(df, an_debut=periode[0], an_fin=periode[1])
             df_monthly = pretraiter_temp_mensuel(df, an_debut=periode[0], an_fin=periode[1])
-            rcycle = df_monthly 
 
-            rcycle_ref = None
+            # --- Référence
             resum_ref = None
+            df_month_ref = None
             if afficher_reference:
                 resum_ref = pretraiter_temp_annuelle(df, an_debut=1959, an_fin=1987)
-                rcycle_ref = pretraiter_temp_mensuel(df, an_debut=1959, an_fin=1987)
+                df_month_ref = pretraiter_temp_mensuel(df, an_debut=1959, an_fin=1987)
 
+            # --- Affichage
             afficher_titre_temp(selected_commune)
             col1, col2 = st.columns(2)
             with col1:
-                afficher_temp_mensuel(rcycle, df, selected_commune, an_debut=periode[0], an_fin=periode[1], df_month_ref=rcycle_ref)
+                afficher_temp_mensuel(df_monthly, df, selected_commune, an_debut=periode[0], an_fin=periode[1], df_month_ref=df_month_ref)
             with col2:
-                afficher_temp_annuelle(resumyear, df, selected_commune,an_debut=periode[0], an_fin=periode[1],an_reference=afficher_reference,periode_ref=(1959, 1987),resum_ref=resum_ref)
+                afficher_temp_annuelle(resumyear, df, selected_commune, an_debut=periode[0], an_fin=periode[1],
+                               an_reference=afficher_reference, periode_ref=(1959, 1987), resum_ref=resum_ref)
                 st.markdown("""
-                <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de l’ETP au fil des années, sans les pics et creux annuels.</small>
+                <small>📈 <strong>Lissage LOESS ou Tendance générale</strong> : cette courbe noire permet de visualiser l’évolution moyenne de la température au fil des années, sans les pics et creux annuels.</small>
                 """, unsafe_allow_html=True)
 
         # Appel du footer à la fin de la page
